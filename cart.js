@@ -6,13 +6,16 @@ const cart = [
 
 function calculateTotal(cartItems) {
   let total = 0;
-  for (let i = 0; i <= cartItems.length; i++) { // Bug: <= should be <
+  for (let i = 0; i < cartItems.length; i++) { // Bug: <= should be <
       total += cartItems[i].price; // Bug: cartItems[i] is undefined on the last iteration
   }
   return total;
 }
 
 function applyDiscount(total, discountRate) {
+   //  Validate discount rate
+  if (discountRate < 0) discountRate = 0;
+  if (discountRate > 1) discountRate = 1;
   return total - total * discountRate; // Bug: Missing validation for discountRate
 }
 
@@ -21,7 +24,7 @@ function generateReceipt(cartItems, total) {
   cartItems.forEach(item => {
       receipt += `${item.name}: $${item.price}\n`;
   });
-  receipt += `Total: $${total.toFixed(2)}`; // Bug: total may not be a number
+  receipt += `Total: $${Number(total).toFixed(2)}`; // Bug: total may not be a number
   return receipt;
 }
 
@@ -31,5 +34,51 @@ const total = calculateTotal(cart);
 const discountedTotal = applyDiscount(total, 0.2); // 20% discount
 const receipt = generateReceipt(cart, discountedTotal);
 
-document.getElementById("total").textContent = `Total: $${discountedTotal}`;
+document.getElementById("total").textContent = `Total: $${discountedTotal.toFixed(2)}`;
 document.getElementById("receipt").textContent = receipt;
+
+Test Cases to Validate
+
+Normal cart (in this case) → Works fine.
+Empty cart ([]) → Total = 0, receipt shows only “Total: $0.00”.
+Single item → Correct calculation.
+DiscountRate = 0 → No discount.
+DiscountRate = 1 → Free (Total = $0).
+
+//After Fixing the bugs on the webpage we will see
+
+Total: $1360.00
+Items:
+Laptop: $1000
+Phone: $500
+Headphones: $200
+Total: $1360.00
+
+//in the console we see
+
+Starting shopping cart calculation...
+
+//Edge case outputs
+
+Total: $0.00
+Items:
+Total: $0.00
+
+//one item( if for eg: name: "coffee", price:5)
+
+Total: $4.00
+Items:
+Coffee: $5
+Total: $4.00
+
+//Discount=0
+
+Total: $1700.00
+
+//Discount = 1
+
+Total: $0.00
+
+
+
+  
